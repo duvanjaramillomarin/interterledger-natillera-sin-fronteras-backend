@@ -1,22 +1,20 @@
 import { createAuthenticatedClient } from '@interledger/open-payments'
-import {
-  SecretsManagerClient,
-  GetSecretValueCommand,
-} from "@aws-sdk/client-secrets-manager";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { QueryCommand, DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
+import { QueryCommand, DynamoDBDocumentClient, PutCommand } from "@aws-sdk/lib-dynamodb";
 
-export const paymentHandler = async (event: any) => {
+export const handler = async (event: any) => {
   try {
-    const userInfo = await getUserInfo(event.username);
-    const keys = await getSecrets(userInfo.source);
+    const userInfo = await getUserInfo(event.auth.username);
+    const keys = userInfo.walletInfo.walletKeys;
     const client = await createAuthenticatedClient({
       walletAddressUrl: keys.walletAddressUrl,
-      privateKey: keys.privateKey,
-      keyId: keys.keyId
+      privateKey: `-----BEGIN PRIVATE KEY-----\n${keys.privateKey}\n-----END PRIVATE KEY-----\n`,
+      keyId: keys.keyId,
+      validateResponses: false
     });
 
-    const receivingWalletAddressURL = event.walletAddress;
+    const receivingWalletAddressURL = event.body.walletAddress;
+    console.log(receivingWalletAddressURL);
 
     const receivingWalletAddress = await client.walletAddress.get({
       url: receivingWalletAddressURL
@@ -48,14 +46,14 @@ export const paymentHandler = async (event: any) => {
         incomingAmount: {
           assetCode: receivingWalletAddress.assetCode,
           assetScale: receivingWalletAddress.assetScale,
-          value: event.amount,
+          value: event.body.amount,
         },
       }
     );
 
     const quoteGrant = await client.grant.request(
       {
-        url: userInfo.walletInfo.walletAddress.authServer,
+        url: userInfo.walletInfo.authServer,
       },
       {
         access_token: {
@@ -71,19 +69,26 @@ export const paymentHandler = async (event: any) => {
 
     const quote = await client.quote.create(
       {
-        url: userInfo.walletInfo.walletAddress.resourceServer,
+        url: userInfo.walletInfo.resourceServer,
         accessToken: quoteGrant.access_token.value,
       },
       {
-        walletAddress: userInfo.walletInfo.walletAddress.id,
+        walletAddress: userInfo.walletInfo.id,
         receiver: incomingPayment.id,
         method: "ilp",
       }
     );
 
+    //TO DO
+    //should save an event in table dynamodb payments-history con el status de quoted pending
+
+    return quote;
+
+    //TO DO
+    //next step or next lambda 
     const outgoingPaymentGrant = await client.grant.request(
       {
-        url: userInfo.walletInfo.walletAddress.authServer,
+        url: userInfo.walletInfo.authServer,
       },
       {
         access_token: {
@@ -98,7 +103,7 @@ export const paymentHandler = async (event: any) => {
                   value: quote.debitAmount.value,
                 },
               },
-              identifier: userInfo.walletInfo.walletAddress.id,
+              identifier: userInfo.walletInfo.id,
             },
           ],
         },
@@ -116,34 +121,13 @@ export const paymentHandler = async (event: any) => {
   }
 }
 
-const getSecrets = async (secretsName: string): Promise<any> => {
-  const client = new SecretsManagerClient({
-    region: "us-east-1",
-  });
-
-  let response;
-
-  try {
-    response = await client.send(
-      new GetSecretValueCommand({
-        SecretId: secretsName,
-        VersionStage: "AWSCURRENT",
-      })
-    );
-  } catch (error) {
-    throw error;
-  }
-
-  return response.SecretString;
-}
-
 const getUserInfo = async (username: string) => {
   try {
-    const client = new DynamoDBClient({ region: 'us-east-1' });
+    const client = new DynamoDBClient({ region: 'us-east-2' });
     const docClient = DynamoDBDocumentClient.from(client);
 
     const command = new QueryCommand({
-      TableName: process.env.USERS_VIEW_TABLE,
+      TableName: process.env.USER_VIEW_TABLE,
       KeyConditionExpression: "#source = :source",
       Limit: 1,
       ScanIndexForward: false,
@@ -157,6 +141,22 @@ const getUserInfo = async (username: string) => {
 
     const response = await docClient.send(command);
     return response.Items[0] || null;
+  } catch (error) {
+    throw error;
+  }
+}
+
+const savePaymentHistory = async (params: any) => {
+  try {
+    const client = new DynamoDBClient({ region: 'us-east-2' });
+    const docClient = DynamoDBDocumentClient.from(client);
+
+    try {
+      const data = await docClient.send(new PutCommand(params));
+      console.log("¡Evento guardado con éxito!", data);
+    } catch (error) {
+      console.error("Error al guardar el evento:", error);
+    }
   } catch (error) {
     throw error;
   }
