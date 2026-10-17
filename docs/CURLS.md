@@ -5,7 +5,8 @@ Explicación del API: [API.md](API.md). Prueba guiada automática: `bash scripts
 
 > Estado al 2026-10-16 (noche): todas las rutas de este archivo están desplegadas en `dev` y piden
 > el **IdToken** (sin token → 401). Pagos: secciones 3–8. Bloque A (perfil, billeteras, cuentas
-> guardadas, natilleras): secciones 9–14. Primer pago real EUR→COP completado con este flujo.
+> guardadas, natilleras): secciones 9–14. Préstamos fase 1: secciones 15–19. Primer pago real
+> EUR→COP completado con este flujo.
 
 ## 0 · Variables
 
@@ -237,3 +238,65 @@ Unirse (repetirlo no duplica):
 ```bash
 curl -s -X POST "$API/natilleras/join" -H "Authorization: Bearer $TOKEN_2" -H 'Content-Type: application/json' -d '{"natilleraInvitation":"'"$CODE"'"}'
 ```
+
+---
+
+Préstamos, fase 1 (sin Open Payments). Detalle y reglas: [API-PRESTAMOS.md](API-PRESTAMOS.md).
+El préstamo va en la **moneda del fondo** y no puede pasar de lo aportado (`fundTotal`).
+
+## 15 · Simular — `GET /loans/simulate`
+
+No guarda nada. Interés: 1 % del saldo por cuota; de 1 a 12 cuotas.
+
+```bash
+curl -s "$API/loans/simulate?value=1000000&assetCode=COP&assetScale=2&installments=3" -H "Authorization: Bearer $TOKEN"
+```
+
+Respuesta: `{ amount, installments, receiveAmount, highestInstallment, schedule: [{ n, capital, interest, total, status }] }`.
+
+## 16 · Pedir un préstamo — `POST /loans/requests`
+
+Solo integrantes; uno a la vez (si no → **409** `LoanAlreadyActive`); sin pasar del fondo (**409** `InsufficientFunds`).
+
+```bash
+curl -s -X POST "$API/loans/requests" -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json' -d '{"natilleraId":"'"$NATILLERA_ID"'","value":"1000000","assetCode":"COP","assetScale":2,"installments":3}'
+```
+
+Respuesta: `{ requestId, natilleraId, requesterName, amount, installments, repaymentAuthorized, status: "pending", createdAt }`.
+
+```bash
+REQUEST_ID=<requestId>
+```
+
+## 17 · Mis préstamos — `GET /loans/mine`
+
+Con varias natilleras se puede filtrar con `?natilleraId=$NATILLERA_ID` (también en la sección 18).
+
+```bash
+curl -s "$API/loans/mine" -H "Authorization: Bearer $TOKEN"
+```
+
+Respuesta: `{ request, loan }` (`request` = la solicitud más reciente o `null`; `loan` solo cuando ya se desembolsó).
+
+## 18 · Solicitudes pendientes (ADMIN) — `GET /loans/requests?status=pending`
+
+Con el token de quien **creó** la natillera. Cualquier otra persona recibe `[]`.
+
+```bash
+TOKEN_ADMIN=<IdToken de la ADMIN>
+```
+
+```bash
+curl -s "$API/loans/requests?status=pending" -H "Authorization: Bearer $TOKEN_ADMIN"
+```
+
+## 19 · Decidir (ADMIN) — `POST /loans/requests/{requestId}/decision`
+
+Rechazar → `{ "status": "rejected" }`. Repetir → **409** `AlreadyDecided`. Si no es la ADMIN → **404**.
+
+```bash
+curl -s -X POST "$API/loans/requests/$REQUEST_ID/decision" -H "Authorization: Bearer $TOKEN_ADMIN" -H 'Content-Type: application/json' -d '{"accepted":false}'
+```
+
+Aprobar (`"accepted":true`) todavía no desembolsa: **409** `RepaymentNotAuthorized` mientras no se
+autoricen las cuotas, y **501** `DisbursementNotAvailable` hasta la fase 2 (Open Payments).

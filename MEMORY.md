@@ -183,6 +183,24 @@ Decisiones técnicas aún sin tomar:
   **Duvan maneja `start-payment` por ahora: no correr `infra/deploy-payments.sh`** (la redespliega).
   Su `start-payment` falla con `AccessDenied` al leer el secreto `prueba1`: lo bloquea una **SCP de la
   organización** (no se arregla con IAM). Solución: un solo secreto (`OP_SECRET_ID`), región us-east-2.
+- 2026-10-17 (~01:00 COL) · **Decisión del equipo: priorizar funcionalidad para la hackatón.** El
+  `start-payment` desplegado es el de Duvan (3 fases: start → continue → complete; hoy devuelve la quote)
+  y usa la llave privada de cada usuario guardada en `user-info` (`walletInfo.walletKeys`; `prueba1` ya la
+  tiene). Queda como **deuda técnica de seguridad** para después de la hackatón: llaves en texto plano en
+  DynamoDB y `console.log` de la llave (se pidió quitar esa línea). Versión segura de referencia:
+  `deploy/payments/src/start-payment.ts` (una sola llave del cliente en Secrets Manager). Rotar las llaves
+  de la Test Wallet después de la demo. Equivalencia: start+continue de Duvan = nuestro `start-payment`;
+  complete = `return-payment` / `finish-payment`.
+- 2026-10-17 (~01:05 COL) · **Préstamos fase 1 desplegado** (PR #3 de Henry, fusionado en `david`):
+  tabla `natillera-loan-request` (+ `author-index`, `natillera-index`), 5 Lambdas y 5 rutas VTL
+  (deployment `g1qlqr`). 401 sin token en las 5. Probado con `ciro-demo-euro` (ADMIN de "Familia Ciro"):
+  simular OK (BigInt), pedir → 409 `InsufficientFunds` (fondo en 0, falta un aporte), otra moneda → 400,
+  mis préstamos → vacío, pendientes → `[]`, decidir por no-ADMIN → 404. Aprobar/desembolsar = fase 2.
+  Ojo: tras un deployment, el stage tarda ~1 min; antes responde 403 "Missing Authentication Token".
+- 2026-10-17 (~01:20 COL) · **PR #4 (préstamos con varias natilleras) desplegado** sin correr el script
+  completo: `request-loan`, `get-my-loans`, `list-loan-requests` (respaldo v1 de cada una) y plantillas de
+  `GET /loans/requests` y `GET /loans/mine` con `natilleraId` opcional (escapado). Deployment `pxnk9k`.
+  Probado: listas vacías, 409 `InsufficientFunds`, 401 sin token.
 
 ### op-core
 - (vacío)
