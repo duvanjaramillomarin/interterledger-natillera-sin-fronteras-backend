@@ -25,5 +25,7 @@ export const handler = async (event) => {
   const { Item } = await dynamo.send(new GetCommand({ TableName: USERS_TABLE, Key: { source: username, id: 1 } }));
   if (!Item) return json(404, { error: 'NotFound', message: 'User not found' });
 
-  return json(200, { ...Item, userId: claims.sub });
+  // userId = username: es la identidad que usan start-payment (`author`, `integrants`) y
+  // GET /natilleras/mine (`members[].userId`); el front los compara para «¿A nombre de quién?».
+  return json(200, { ...Item, userId: username, username, sub: claims.sub });
 };

@@ -10,6 +10,7 @@ Cada persona del equipo agrega lo suyo en las cuatro secciones y sus prompts lit
 |---|---|---|---|
 | Claude Code (app de escritorio) | Claude Opus 5.5 | David Ciro | Plan de pago de Claude (suscripción); consumo de créditos: _por completar_ |
 | _(Duvan: agregar si usó alguna herramienta de IA)_ | | Duvan Jaramillo | |
+| Claude Code (app de escritorio) | Claude Opus 5.5 | Henry Taborda (front, apoyo al back) | Plan de pago de Claude (suscripción) |
 
 ## Where and How We Used AI
 
@@ -70,6 +71,15 @@ Los commits hechos con IA llevan `Co-Authored-By: Claude` en el historial de git
   decisiones fueron del equipo: TypeScript, sin IaC, región `us-east-2`, el reparto de trabajo y las
   llaves de las tablas.
 
+**Henry Taborda · Claude Code (apoyo del front al back, 2026-10-16 noche)**
+
+- **`GET /natilleras/mine` y ajuste de `GET /me`:** Claude escribió [`deploy/natilleras-mine/index.mjs`](deploy/natilleras-mine/index.mjs)
+  (solo DynamoDB, sin Open Payments), cambió `userId` a `username` en [`deploy/me/index.mjs`](deploy/me/index.mjs),
+  la semilla [`infra/seed-natillera.json`](infra/seed-natillera.json) y el script
+  [`infra/deploy-natillera.sh`](infra/deploy-natillera.sh). Guía en [`docs/API-NATILLERA.md`](docs/API-NATILLERA.md).
+- **Revisión humana:** Henry revisó el PR; el despliegue en AWS lo hace David (Henry no tiene acceso a la cuenta).
+  Probado localmente con DynamoDB simulado; sin probar en AWS.
+
 ## Prompt Log
 
 Prompts literales en [`/prompts`](prompts/):
@@ -77,3 +87,4 @@ Prompts literales en [`/prompts`](prompts/):
 | Archivo | Persona | Herramienta | Tema |
 |---|---|---|---|
 | [`prompts/backend-infra-claude-code-2026-10-16.md`](prompts/backend-infra-claude-code-2026-10-16.md) | David | Claude Code | Setup del repo, infra AWS, Cognito, pre-signup, API Gateway |
+| [`prompts/henry-claude-code-2026-10-16.md`](prompts/henry-claude-code-2026-10-16.md) | Henry | Claude Code | `GET /natilleras/mine`, `GET /me` y su despliegue |

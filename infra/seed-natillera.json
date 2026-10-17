@@ -1,0 +1,17 @@
+{
+  "natilleraId": "n-rosa",
+  "natilleraName": "Natillera Familia Rosa",
+  "author": "prueba1",
+  "admins": ["prueba1"],
+  "integrants": ["prueba1", "prueba2", "prueba3"],
+  "names": { "prueba1": "Doña Rosa", "prueba2": "Luz", "prueba3": "Andrés" },
+  "walletAddress": "https://ilp.interledger-test.dev/f9a1abde",
+  "assetCode": "EUR",
+  "assetScale": 2,
+  "quota": "1100",
+  "openingTotals": { "prueba1": "3300", "prueba2": "2200", "prueba3": "1100" },
+  "paidThisMonth": ["prueba1", "prueba2"],
+  "invitationCode": "ROSA-4821",
+  "joinUrl": "https://natillera.example/unirse/ROSA-4821",
+  "createdAt": "2026-10-16T12:00:00Z"
+}
