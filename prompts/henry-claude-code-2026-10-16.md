@@ -17,3 +17,17 @@ Sesión del repo front (`natillera-front`). Registro completo en el front: `prom
 > con que seguimos'
 
 > Sí, escribe los README del front y del back (PR a main y a david) y deja el pedido de la rama main del back para Duvan.
+
+> verifica si ya esta sino lo haces tu
+
+> ya duvan nos dio acceso, y ay esta lo de ciro verifica y procede con lo nuestro
+
+> Sí, fusiona tú los PR #4 y #5 del back en david y los #4 y #5 del front en main, y después pon main del back al día con david.
+
+> Avancemos con lo que falte del back
+
+> Prioriza el pago real: deja listo lo necesario para redesplegar el start-payment del repo y prueba lo que puedas del flujo; no construyas funciones nuevas.
+
+> ya duvan se fue a dormir ahora estamos solo y ciro tiene su clude con CLI en la cuenta de aws, actua y mandale lo que necesite
+
+> Haz commit y push de la rama fix/redeploy-start-payment y abre el PR; yo apruebo el permiso. La fusión la hace Ciro.

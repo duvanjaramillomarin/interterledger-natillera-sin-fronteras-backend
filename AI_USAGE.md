@@ -101,6 +101,7 @@ Los commits hechos con IA llevan `Co-Authored-By: Claude` en el historial de git
 - **Revisión humana:** Henry pidió el cambio; Ciro lo revisó y Claude lo desplegó (solo la Lambda `get-me`).
 - **Préstamos, fase 1 (sin Open Payments):** Claude escribió [`deploy/prestamos`](deploy/prestamos) (simular, pedir, listar pendientes, mi préstamo, rechazar; 5 Lambdas con el patrón del bloque A y 5 pruebas locales), [`infra/deploy-prestamos.sh`](infra/deploy-prestamos.sh) y [`docs/API-PRESTAMOS.md`](docs/API-PRESTAMOS.md). Henry decidió el alcance; Ciro revisa y despliega.
 - **README del repo:** Claude escribió [`README.md`](README.md) (arquitectura, pago con Open Payments, rutas, despliegue, seguridad) y el pedido de la rama `main` en `MEMORY.md`; Henry lo revisó.
+- **Redespliegue de `start-payment` del repo:** Claude verificó el bundle (zip idéntico al build, validaciones y cliente de Open Payments con `validateResponses: false` probados en Node) y escribió [`infra/redeploy-start-payment.sh`](infra/redeploy-start-payment.sh) y [`docs/ENCARGO-CIRO-START-PAYMENT.md`](docs/ENCARGO-CIRO-START-PAYMENT.md). El despliegue lo hace Ciro.
 
 ## Prompt Log
 
