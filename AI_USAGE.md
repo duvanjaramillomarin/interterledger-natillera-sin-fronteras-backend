@@ -50,6 +50,15 @@ Cada persona del equipo agrega lo suyo en las cuatro secciones y sus prompts lit
 - **Verificaciones automáticas:** consultas a la wallet de prueba (`GET` público), una llamada de
   prueba al endpoint de Cognito y la validación de sintaxis de las Lambdas con `node --check`.
 
+**Camilo · Claude Code (bloque A: natilleras, cuentas guardadas y perfil)**
+
+- **Lambdas de natilleras** ([`deploy/natilleras/src`](deploy/natilleras/src)): crear natillera,
+  invitación, unirse, "mi natillera" con totales y estado de cada socio, cuentas guardadas, `GET /me` y
+  verificación de billetera. Claude las escribió desde `docs/ARQUITECTURA.md` y el contrato del front,
+  con el mismo patrón VTL de pagos, y las probó en local con un DynamoDB en memoria (6 casos).
+- **Despliegue** ([`infra/deploy-natilleras.sh`](infra/deploy-natilleras.sh)): script de AWS CLI que
+  Claude escribió; lo ejecuta David Ciro. Doc: [`docs/API-NATILLERAS.md`](docs/API-NATILLERAS.md).
+
 Los commits hechos con IA llevan `Co-Authored-By: Claude` en el historial de git.
 
 ## What We Did Ourselves
@@ -77,3 +86,4 @@ Prompts literales en [`/prompts`](prompts/):
 | Archivo | Persona | Herramienta | Tema |
 |---|---|---|---|
 | [`prompts/backend-infra-claude-code-2026-10-16.md`](prompts/backend-infra-claude-code-2026-10-16.md) | David | Claude Code | Setup del repo, infra AWS, Cognito, pre-signup, API Gateway |
+| [`prompts/backend-natilleras-claude-code-2026-10-16.md`](prompts/backend-natilleras-claude-code-2026-10-16.md) | Camilo | Claude Code | Bloque A: natilleras, cuentas guardadas, perfil |

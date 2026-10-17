@@ -39,8 +39,8 @@ P2 = flujos 7, 8, 9, 13; P3 = flujos 10, 11, 12B; P4 no está en el diagrama.
 | `op-core` | Capa compartida del cliente Open Payments (cliente autenticado, verificar wallet, incoming, quote, grants, continue, outgoing, rotate token) + utilidades de montos | Capa Open Payments, tipos de montos | duvdev | — | libre |
 | `pagos` | Flujos 3 y 4 (start / finish payment), 5 y 6 (cuentas guardadas y pago a ellas) | — | duvdev | — | libre |
 | `usuarios` | Flujos 1 y 2 (signup con verificación de wallet, login Cognito) y 13 (lecturas GET) | Middleware de auth (sub del token) | duvdev | — | libre |
-| `natillera` | Flujos 7, 8, 9 (crear, unirse, aportar) | — | duvdev | — | libre |
-| `credito` | Flujos 10, 11, 12, 12B (préstamos, recurrentes, cobro de cuotas) | — | duvdev | — | libre |
+| `natillera` | Flujos 5, 7, 8 y 13 sin préstamos (cuentas, crear, unirse, `/me`, `/natilleras/mine`) | Tablas `saved-accounts`, `natillera-registration` | Camilo (rama `feat/natilleras`) | Claude Code de Camilo, 2026-10-16 noche | código + pruebas locales listos; falta desplegar (Ciro) |
+| `credito` | Flujos 10, 11, 12, 12B (préstamos, recurrentes, cobro de cuotas) | — | Henry (10, 11 y lecturas de préstamos; 12/12B quedan en demo) | Claude Code de Henry, 2026-10-16 noche | reclamado |
 
 Orden sugerido: `infra` + `op-core` primero (desbloquean todo); `usuarios` en paralelo con
 mocks; luego `pagos`, `natillera`, `credito`.
@@ -109,6 +109,10 @@ Decisiones técnicas aún sin tomar:
   Contrato del front (`docs/api-contrato.md`): `POST /payments` recibe `{ kind: 'p2p'|'aporte',
   customWalletName? | natilleraId?, value, assetCode, assetScale, returnUrl }`, no `walletAddress`.
   Faltan además `POST /payments/{id}/finish` y `GET /payments/{id}`.
+- 2026-10-16 noche · de natillera (Camilo) a pagos (Ciro): (1) poner `NATILLERA_RECORDS_TABLE=natillera-records`
+  en el entorno de `finish-payment` y `return-payment` (en `env_file` de `deploy-payments.sh`); sin eso
+  `complete.ts` no registra aportes y el total del fondo queda en 0. (2) Desplegar el bloque A con
+  `infra/deploy-natilleras.sh` (ver docs/API-NATILLERAS.md).
 - formato: `YYYY-MM-DD · de <carril> a <carril>: <qué se necesita>`
 
 ## Bitácora por carril
@@ -177,7 +181,12 @@ Decisiones técnicas aún sin tomar:
 - (vacío)
 
 ### natillera
-- (vacío)
+- 2026-10-16 noche · Bloque A en `feat/natilleras` (sale de `david`): 8 Lambdas en `deploy/natilleras`
+  (`get-me`, `verify-wallet`, `save-account`, `list-accounts`, `create-natillera`, `get-invitation`,
+  `join-natillera`, `get-my-natillera`), despliegue en `infra/deploy-natilleras.sh` y doc en
+  [docs/API-NATILLERAS.md](docs/API-NATILLERAS.md). `npm test`: 6/6 con DynamoDB en memoria. Sin desplegar.
+- Contrato con préstamos: el fondo = aportes − `disbursedTotal` (string, unidades menores) de la fila en
+  `natillera-registration`; préstamos lo suma al quedar `completed` un desembolso.
 
 ### credito
 - (vacío)
