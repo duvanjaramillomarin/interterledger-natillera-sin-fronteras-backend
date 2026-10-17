@@ -114,6 +114,7 @@ Decisiones técnicas aún sin tomar:
   `complete.ts` no registra aportes y el total del fondo queda en 0. (2) Desplegar el bloque A con
   `infra/deploy-natilleras.sh` (ver docs/API-NATILLERAS.md).
 - 2026-10-17 · de front (Henry) a Duvan (dueño del repo): **crear la rama `main` y ponerla por defecto antes de las 11:00** (regla de la hackatón: todo en `main` del repo público). Hoy la rama por defecto es `master` y solo tiene el commit inicial; todo el trabajo está en `david`. Pasos: (1) fusionar los PR abiertos en `david`; (2) `git push origin origin/david:refs/heads/main` (o en GitHub: Branches → New branch `main` desde `david`); (3) Settings → General → Default branch → `main` (solo el dueño puede); (4) desde ahí, todo PR va a `main`. No borrar `master` ni `david` hasta después de la entrega.
+- 2026-10-17 (~01:40 COL) · de front (Henry) a infra (Ciro o Camilo): **reemplaza la decisión de la 01:00 sobre `start-payment`.** Se redespliega el **del repo** con `infra/redeploy-start-payment.sh` (PR #6, paso a paso en `docs/ENCARGO-CIRO-START-PAYMENT.md`). Motivos: funciona con la app sin tocar el front (la de Duvan responde la quote, no `{ paymentId, redirectUrl }`), ya hizo el pago real EUR→COP y usa solo la llave del cliente. La de Duvan queda como versión de respaldo. Lo corre quien tenga AWS CLI primero. La billetera `melos` (prueba1/2/3) es de Camilo: él aprueba en la Test Wallet.
 - formato: `YYYY-MM-DD · de <carril> a <carril>: <qué se necesita>`
 
 ## Bitácora por carril

@@ -31,3 +31,9 @@ Sesión del repo front (`natillera-front`). Registro completo en el front: `prom
 > ya duvan se fue a dormir ahora estamos solo y ciro tiene su clude con CLI en la cuenta de aws, actua y mandale lo que necesite
 
 > Haz commit y push de la rama fix/redeploy-start-payment y abre el PR; yo apruebo el permiso. La fusión la hace Ciro.
+
+> de acuerdo, por ahora lo importante es hacer que todo funcione
+
+> La test wallet de Melos es de Camilo. Vale, aquí hasta el momento revisemos que podemos continuar entonces. Recuerda que ya Duan no está, entonces nos toca a nosotros. Camilo, ya está instalando la Awscli para avanzar. Aquí vamos gestionando los cambios de ellos..
+
+> Seguimos con el start-payment del repo (PR #6): funciona con la app tal como está y ya pagó EUR→COP. La versión de Duvan queda respaldada. Avísale a Ciro y deja el encargo listo para que lo corra Ciro o Camilo.
